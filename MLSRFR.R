@@ -44,23 +44,23 @@ MLSRFR <- function(X1, X2, Y1, Y2, lam1, lam2, lam3, lam4, ranks)  {
     Ghat_2 <- (crossprod(Wx2,t(X2))) %*% ((X2 %*% W2sx) %*% W2sy - Y2) + 2 * lam4 * (Wy2)
     Ghat_s <- ((crossprod(Wsx,t(X1))) %*% ((X1 %*% W1sx) %*% W1sy - Y1)) +
       ((crossprod(Wsx,t(X2))) %*% ((X2 %*% W2sx) %*% W2sy - Y2)) + 2 * lam4 * (Wsy)
-    Wy1 <- wthresh(Wy1 - Ghat_1 / Beta_1, lam2 / Beta_1)
-    Wy2 <- wthresh(Wy2 - Ghat_2 / Beta_2, lam2 / Beta_2)
-    Wsy <- wthresh(Wsy - Ghat_s / Beta_s, lam2 / Beta_s)
+    Wy1 <- wthresh(Wy1 - Ghat_1 / Beta_1, lam3 / Beta_1)
+    Wy2 <- wthresh(Wy2 - Ghat_2 / Beta_2, lam3 / Beta_2)
+    Wsy <- wthresh(Wsy - Ghat_s / Beta_s, lam3 / Beta_s)
 
     W1sy <- rbind(Wsy, Wy1)
     W2sy <- rbind(Wsy, Wy2)
     
     ########### updating Wx ############
-    alpha_1 <- norm(crossprod(X1) %*% Wsx, 'F') * norm(tcrossprod(W1sy, Wy1), 'F') + 2 * lam3
-    alpha_2 <- norm(crossprod(X2) %*% Wsx, 'F') * norm(tcrossprod(W2sy, Wy2), 'F') + 2 * lam3
+    alpha_1 <- norm(crossprod(X1) %*% Wsx, 'F') * norm(tcrossprod(W1sy, Wy1), 'F') + 2 * lam2
+    alpha_2 <- norm(crossprod(X2) %*% Wsx, 'F') * norm(tcrossprod(W2sy, Wy2), 'F') + 2 * lam2
     alpha_s <- norm(crossprod(X1) %*% Wx1, 'F') * norm(tcrossprod(W1sy, Wsy), 'F') +
-      norm(crossprod(X2) %*% Wx2, 'F') * norm(tcrossprod(W2sy, Wsy), 'F') + 2 * lam3
+      norm(crossprod(X2) %*% Wx2, 'F') * norm(tcrossprod(W2sy, Wsy), 'F') + 2 * lam2
     
-    Hhat_1 <- -t(X1) %*% (Y1 %*% t(Wy1)) + t(X1) %*% ((X1 %*% W1sx) %*% (tcrossprod(W1sy ,Wy1))) + 2 * lam3 * (Wx1) 
-    Hhat_2 <- -t(X2) %*% (Y2 %*% t(Wy2)) + t(X2) %*% ((X2 %*% W2sx) %*% (tcrossprod(W2sy ,Wy2))) + 2 * lam3 * (Wx2)
+    Hhat_1 <- -t(X1) %*% (Y1 %*% t(Wy1)) + t(X1) %*% ((X1 %*% W1sx) %*% (tcrossprod(W1sy ,Wy1))) + 2 * lam2 * (Wx1) 
+    Hhat_2 <- -t(X2) %*% (Y2 %*% t(Wy2)) + t(X2) %*% ((X2 %*% W2sx) %*% (tcrossprod(W2sy ,Wy2))) + 2 * lam2 * (Wx2)
     Hhat_s <- -t(X1) %*% (Y1 %*% t(Wsy)) + t(X1) %*% ((X1 %*% W1sx) %*% (tcrossprod(W1sy ,Wsy))) +
-      -t(X2) %*% (Y2 %*% t(Wsy)) + t(X2) %*% ((X2 %*% W2sx) %*% (tcrossprod(W2sy ,Wsy))) + 2 * lam3 * (Wsx)
+      -t(X2) %*% (Y2 %*% t(Wsy)) + t(X2) %*% ((X2 %*% W2sx) %*% (tcrossprod(W2sy ,Wsy))) + 2 * lam2 * (Wsx)
     
     Wx1 <- wthresh(Wx1 - Hhat_1 / alpha_1, lam1 / alpha_1)
     Wx2 <- wthresh(Wx2 - Hhat_2 / alpha_2, lam1 / alpha_2)
@@ -71,8 +71,9 @@ MLSRFR <- function(X1, X2, Y1, Y2, lam1, lam2, lam3, lam4, ranks)  {
     
     ########### stopping check ###########
     obj_vals[iter] <- 0.5 * norm(Y1 - (X1 %*% W1sx) %*% W1sy, 'F')^2 + norm(Y2 - (X2 %*% W2sx) %*% W2sy, 'F')^2 + 
-      lam1 * (sum(abs(Wx1)) + sum(abs(Wx2)) + sum(abs(Wsx))) + lam2 * (sum(abs(Wy1)) + sum(abs(Wy2)) + sum(abs(Wsy))) + 
-      lam3 * (sqrt(sum(Wx1^2)) + sqrt(sum(Wx2^2)) + sqrt(sum(Wsx^2))) + lam3 * (sqrt(sum(Wy1^2)) + sqrt(sum(Wy2^2)) + sqrt(sum(Wsy^2)))
+      lam1 * (sum(abs(Wx1)) + sum(abs(Wx2)) + sum(abs(Wsx))) + lam2 * (sqrt(sum(Wx1^2)) + sqrt(sum(Wx2^2)) + sqrt(sum(Wsx^2))) + 
+      lam3 * (sum(abs(Wy1)) + sum(abs(Wy2)) + sum(abs(Wsy))) + lam4 * (sqrt(sum(Wy1^2)) + sqrt(sum(Wy2^2)) + sqrt(sum(Wsy^2))) 
+     
     
     dif <- (abs(obj_vals[iter]- obj_vals[iter-1]))/obj_vals[iter-1] 
     if (dif < tol || is.nan(dif)) {
