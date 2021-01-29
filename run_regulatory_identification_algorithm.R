@@ -47,8 +47,8 @@ lam2 <- 25
 lam3 <- 300
 lam4 <- 30
 
-source("MLSRFR.R")
-out <- MLSRFR(X1, X2, Y1, Y2, lam1, lam2, lam3, lam4, ranks)
+source("MSRFR.R")
+out <- MSRFR(X1, X2, Y1, Y2, lam1, lam2, lam3, lam4, ranks)
 Wx1 <- as.matrix(data.frame(out[1]))
 Wx2 <- as.matrix(data.frame(out[2]))
 Wsx <- as.matrix(data.frame(out[3]))
@@ -126,5 +126,5 @@ summary$Wsx <- Wsx
 summary$iteration <- iteration
 summary$obj_vals <- obj_vals
 
-save(summary, file = sprintf("%s/MLSRFR_summary.RData", RESULT_PATH))
+save(summary, file = sprintf("%s/MSRFR_summary.RData", RESULT_PATH))
 
